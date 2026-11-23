@@ -1,0 +1,505 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>SonicFlowPro</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: cabecera con marca, barra de 3 pestañas fija, vista en tarjetas de ancho máximo 880px */
+:root {
+  --bg: #F6F5FB;
+  --surface: #FFFFFF;
+  --surface-2: #F0EEF8;
+  --fg: #1C1933;
+  --muted: #625E7C;
+  --line: #E2DFEE;
+  --accent: #8B5CF6;
+  --accent-text: #6A3CE0;
+  --accent-soft: #EEE8FE;
+  --on-accent: #FFFFFF;
+  --orange: #F97316;
+  --pink: #EC4899;
+  --cyan: #0891B2;
+  --purple: #8B5CF6;
+  --indigo: #6366F1;
+  --green: #16A34A;
+  --teal: #0D9488;
+  --ok: #16A34A;
+  --warn: #EA8A0C;
+  --hot: #DC2626;
+  --shadow: 0 1px 2px rgba(28,25,51,.06), 0 4px 14px rgba(28,25,51,.05);
+  --font-display: "Space Grotesk", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12101F; --surface: #1B1830; --surface-2: #242040; --fg: #EEEBFA; --muted: #A5A0C2;
+    --line: #2F2A4D; --accent: #8B5CF6; --accent-text: #B9A1FF; --accent-soft: #2B2255;
+    --orange: #FB923C; --pink: #F472B6; --cyan: #22D3EE; --purple: #A78BFA; --indigo: #818CF8;
+    --green: #4ADE80; --teal: #2DD4BF; --ok: #4ADE80; --warn: #FBBF24; --hot: #F87171;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 4px 14px rgba(0,0,0,.25);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12101F; --surface: #1B1830; --surface-2: #242040; --fg: #EEEBFA; --muted: #A5A0C2;
+  --line: #2F2A4D; --accent: #8B5CF6; --accent-text: #B9A1FF; --accent-soft: #2B2255;
+  --orange: #FB923C; --pink: #F472B6; --cyan: #22D3EE; --purple: #A78BFA; --indigo: #818CF8;
+  --green: #4ADE80; --teal: #2DD4BF; --ok: #4ADE80; --warn: #FBBF24; --hot: #F87171;
+  --shadow: 0 1px 2px rgba(0,0,0,.4), 0 4px 14px rgba(0,0,0,.25);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg);
+  font-family: var(--font-body); font-size: 15px; line-height: 1.5;
+  padding-block: 0 48px;
+}
+body::before {
+  content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px);
+  background: var(--bg); z-index: 10;
+}
+.wrap {
+  width: 100%; max-width: 880px; margin-inline: auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+
+/* Cabecera */
+.brand { display: flex; align-items: center; gap: 12px; padding-block: 20px 14px; }
+.logo { flex: none; width: 56px; height: 56px; border-radius: 14px; box-shadow: var(--shadow); display: block; }
+.brand h1 { margin: 0; font: 700 24px/1.1 var(--font-display); letter-spacing: -.01em; }
+.brand h1 span { color: var(--accent-text); }
+.brand p { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+
+/* Pestañas principales */
+.tabs-bar {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 9;
+  background: var(--bg); border-bottom: 1px solid var(--line);
+}
+.tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding-block: 6px 0; }
+.tab {
+  background: none; border: 0; padding: 10px 6px 12px; color: var(--muted);
+  font: 600 14px var(--font-body); border-bottom: 3px solid transparent;
+  border-radius: 8px 8px 0 0; display: flex; flex-direction: column; align-items: center; gap: 2px;
+}
+.tab small { font: 500 11px var(--font-body); opacity: .8; }
+.tab[aria-selected="true"] { color: var(--accent-text); border-bottom-color: var(--accent); background: var(--accent-soft); }
+.tab:hover:not([aria-selected="true"]) { background: var(--surface-2); }
+
+main { padding-block: 18px 0; }
+
+/* Subpestañas */
+.seg { display: inline-flex; max-width: 100%; background: var(--surface-2); border-radius: 10px; padding: 3px; gap: 2px; overflow-x: auto; }
+.seg button { background: none; border: 0; padding: 7px 14px; border-radius: 8px; color: var(--muted); font-weight: 600; font-size: 14px; white-space: nowrap; }
+.seg button[aria-selected="true"] { background: var(--surface); color: var(--accent-text); box-shadow: var(--shadow); }
+
+/* Herramientas */
+.toolbar { display: flex; flex-direction: column; gap: 12px; margin-block: 16px 14px; }
+.search { position: relative; }
+.search svg { position: absolute; left: 12px; top: 50%; translate: 0 -50%; color: var(--muted); pointer-events: none; }
+.search input {
+  width: 100%; padding: 11px 14px 11px 38px; border-radius: 10px; border: 1px solid var(--line);
+  background: var(--surface); font-size: 15px;
+}
+.search input::placeholder { color: var(--muted); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--surface); font-size: 13px; font-weight: 500;
+}
+.chip i { width: 9px; height: 9px; border-radius: 50%; background: var(--c, var(--accent)); }
+.chip[aria-pressed="true"] {
+  border-color: var(--c, var(--accent));
+  background: color-mix(in srgb, var(--c, var(--accent)) 14%, var(--surface));
+  font-weight: 600;
+}
+.row-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.count { color: var(--muted); font-size: 13px; }
+.btn {
+  display: inline-flex; align-items: center; gap: 7px; padding: 8px 14px; border-radius: 9px;
+  border: 1px solid var(--line); background: var(--surface); font-weight: 600; font-size: 13px;
+}
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.btn:hover { border-color: var(--accent); }
+.btn.done { border-color: var(--ok); color: var(--ok); }
+.btn.primary.done { background: var(--ok); border-color: var(--ok); color: #fff; }
+
+/* Tarjetas */
+.list { display: grid; gap: 14px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px; box-shadow: var(--shadow); min-width: 0; }
+.card-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.badge {
+  flex: none; width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center;
+  font: 700 15px var(--font-display); color: var(--c);
+  background: color-mix(in srgb, var(--c) 16%, var(--surface));
+}
+.card-head h3 { margin: 0; font: 600 17px var(--font-display); flex: 1; min-width: 0; }
+.card-head small { display: block; color: var(--muted); font: 400 12px var(--font-body); }
+.params { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.param { background: var(--surface-2); border-radius: 10px; padding: 10px 12px; min-width: 0; }
+.param dt { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 600; margin: 0 0 3px; }
+.param dd { margin: 0; font-size: 14px; font-weight: 500; overflow-wrap: anywhere; }
+.param.boost dd { color: var(--c); font-weight: 600; }
+.tip {
+  margin-top: 12px; padding: 10px 12px; border-radius: 10px; font-size: 14px;
+  background: color-mix(in srgb, var(--c) 10%, var(--surface));
+}
+.tip b { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--c); margin-right: 6px; }
+
+/* Compresión */
+.metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.metric { background: var(--surface-2); border-radius: 10px; padding: 10px 12px; min-width: 0; }
+.metric dt { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 600; margin: 0 0 3px; }
+.metric dd { margin: 0; font-size: 14px; font-weight: 600; }
+.ratio-bar { height: 6px; border-radius: 3px; background: var(--surface-2); margin-top: 12px; overflow: hidden; }
+.ratio-bar span { display: block; height: 100%; background: var(--c); border-radius: 3px; }
+
+.section-title { font: 600 13px var(--font-body); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 26px 0 10px; }
+.presets { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.preset { background: var(--surface); border: 1px solid var(--line); border-top: 4px solid var(--c); border-radius: 12px; padding: 14px; min-width: 0; }
+.preset h4 { margin: 0 0 8px; font: 700 16px var(--font-display); color: var(--c); }
+.preset dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; font-size: 13px; }
+.preset dt { color: var(--muted); }
+.preset dd { margin: 0; text-align: right; font-weight: 600; }
+
+/* Glosario */
+.term h3 { margin: 0 0 4px; font: 600 17px var(--font-display); }
+.term p { margin: 0; color: var(--muted); }
+.term .typical { margin-top: 10px; font-size: 13px; }
+.term .typical b { color: var(--accent-text); }
+
+/* Vistas pendientes */
+.todo { border-style: dashed; box-shadow: none; }
+.todo h2 { margin: 0 0 6px; font: 700 20px var(--font-display); }
+.todo p { margin: 0 0 14px; color: var(--muted); }
+.todo ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
+.empty { text-align: center; color: var(--muted); padding: 32px 16px; border: 1px dashed var(--line); border-radius: 14px; }
+
+.foot { color: var(--muted); font-size: 12px; margin-top: 28px; text-align: center; }
+
+.toast {
+  position: fixed; left: 50%; translate: -50% 12px; opacity: 0; pointer-events: none;
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  background: var(--fg); color: var(--bg); padding: 10px 18px; border-radius: 999px; font-weight: 600; font-size: 14px;
+  transition: opacity .2s, translate .2s; z-index: 20;
+}
+.toast.show { opacity: 1; translate: -50% 0; }
+
+@media (max-width: 560px) {
+  .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .presets { grid-template-columns: 1fr; }
+}
+@media (max-width: 380px) { .params { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { .toast { transition: none; } }
+</style>
+
+<header class="wrap">
+  <div class="brand">
+    <img class="logo" src="logo.jpg" width="56" height="56" alt="Logo de SonicFlowPro">
+    <div>
+      <h1>SonicFlow<span>Pro</span></h1>
+      <p>Guía rápida de producción, mezcla y masterización</p>
+    </div>
+  </div>
+</header>
+
+<div class="tabs-bar">
+  <div class="wrap">
+    <div class="tabs" role="tablist" aria-label="Secciones">
+      <button class="tab" role="tab" id="tab-guia" data-tab="guia">Guía & EQ<small>Ajustes de referencia</small></button>
+      <button class="tab" role="tab" id="tab-flujo" data-tab="flujo">Flujo & Niveles<small>Calculadoras y checklist</small></button>
+      <button class="tab" role="tab" id="tab-mezclas" data-tab="mezclas">Mis Mezclas<small>Tus proyectos</small></button>
+    </div>
+  </div>
+</div>
+
+<main class="wrap" id="view" role="tabpanel"></main>
+<div class="wrap"><p class="foot">Valores orientativos. Ajusta siempre de oído según la fuente y el contexto de la mezcla.</p></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ---------- Datos (orientativos; sustituir por SonicData.swift cuando lo tengamos) ---------- */
+const EQ = [
+  { id:'kick', name:'Kick (Bombo)', short:'Kick', color:'--orange',
+    lowCut:'30 Hz', lowShelf:'+2 dB · 60 Hz', boost:'+3 dB · 3–5 kHz', highCut:'12 kHz',
+    tip:'Recorta entre 250 y 400 Hz (−3 dB) para limpiar el barro y dejar sitio al bajo.' },
+  { id:'snare', name:'Snare (Caja)', short:'Snare', color:'--pink',
+    lowCut:'80 Hz', lowShelf:'+2 dB · 200 Hz', boost:'+3 dB · 5 kHz', highCut:'15 kHz',
+    tip:'Un toque de +2 dB hacia 10 kHz da aire; si suena a lata, baja 800 Hz con un corte estrecho.' },
+  { id:'hats', name:'Hats (Hi-Hats)', short:'Hats', color:'--cyan',
+    lowCut:'300 Hz', lowShelf:'Sin ajuste', boost:'+2 dB · 10 kHz', highCut:'18 kHz',
+    tip:'Si pinchan, no subas más: baja 6–8 kHz con −2 dB y deja el brillo en 10 kHz.' },
+  { id:'toms', name:'Toms', short:'Toms', color:'--purple',
+    lowCut:'60 Hz', lowShelf:'+2 dB · 100 Hz', boost:'+3 dB · 4 kHz', highCut:'12 kHz',
+    tip:'Corta 300–500 Hz (−3 dB) para quitar el efecto caja de cartón y deja respirar la batería.' },
+  { id:'sub', name:'Sub / 808', short:'Sub / 808', color:'--indigo',
+    lowCut:'25 Hz', lowShelf:'+2 dB · 50 Hz', boost:'+2 dB · 900 Hz', highCut:'5 kHz',
+    tip:'Pon el sub en mono por debajo de 120 Hz y refuerza armónicos para que se oiga en altavoces pequeños.' },
+  { id:'vocal', name:'Vocal Principal', short:'Vocal', color:'--green',
+    lowCut:'90 Hz', lowShelf:'−2 dB · 250 Hz', boost:'+2 dB · 3 kHz y +3 dB · 10 kHz', highCut:'18 kHz',
+    tip:'Controla la sibilancia en 6–8 kHz con un de-esser antes de subir el aire en 10 kHz.' }
+];
+
+const COMP_CATS = ['Todos','Batería','Bajo / Armónicos','Voces','Bus / Master'];
+const CAT_COLOR = { 'Batería':'--orange', 'Bajo / Armónicos':'--indigo', 'Voces':'--green', 'Bus / Master':'--teal' };
+const COMP = [
+  { name:'Kick (Bombo)', cat:'Batería', ratio:4, attack:'30 ms', release:'80 ms', gain:'3–5 dB de reducción' },
+  { name:'Snare (Caja)', cat:'Batería', ratio:4, attack:'10 ms', release:'100 ms', gain:'4–6 dB de reducción' },
+  { name:'Hats (Hi-Hats)', cat:'Batería', ratio:2, attack:'5 ms', release:'60 ms', gain:'1–2 dB de reducción' },
+  { name:'Toms', cat:'Batería', ratio:4, attack:'15 ms', release:'120 ms', gain:'3–5 dB de reducción' },
+  { name:'Bajo', cat:'Bajo / Armónicos', ratio:4, attack:'30 ms', release:'120 ms', gain:'3–6 dB de reducción' },
+  { name:'Sub / 808', cat:'Bajo / Armónicos', ratio:3, attack:'40 ms', release:'200 ms', gain:'2–4 dB de reducción' },
+  { name:'Sintes y armónicos', cat:'Bajo / Armónicos', ratio:2, attack:'20 ms', release:'150 ms', gain:'2–3 dB de reducción' },
+  { name:'Vocal Principal', cat:'Voces', ratio:3, attack:'8 ms', release:'80 ms', gain:'3–6 dB de reducción' },
+  { name:'Coros', cat:'Voces', ratio:4, attack:'10 ms', release:'100 ms', gain:'4–6 dB de reducción' },
+  { name:'Bus de batería', cat:'Bus / Master', ratio:2, attack:'30 ms', release:'100 ms', gain:'2–3 dB de reducción' },
+  { name:'Bus master', cat:'Bus / Master', ratio:1.5, attack:'30 ms', release:'Auto', gain:'1–2 dB de reducción' }
+];
+const PRESETS = [
+  { name:'Light', color:'--ok',   ratio:'2:1', knee:'6 dB (suave)', attack:'30 ms', release:'150 ms', note:'Control sutil, casi invisible.' },
+  { name:'Med',   color:'--warn', ratio:'4:1', knee:'3 dB',         attack:'15 ms', release:'100 ms', note:'Compresión audible y firme.' },
+  { name:'Harsh', color:'--hot',  ratio:'8:1', knee:'0 dB (duro)',  attack:'5 ms',  release:'60 ms',  note:'Agresiva, para dar carácter.' }
+];
+const GLOSS = [
+  { term:'Threshold', def:'Nivel a partir del cual el compresor empieza a actuar. Todo lo que pasa de ese umbral se reduce.', typical:'Entre −30 y −10 dB, según la fuente.' },
+  { term:'Ratio', def:'Cuánto se reduce la señal que supera el umbral. Con 4:1, por cada 4 dB que se pase, salen 1 dB.', typical:'1.5:1 en bus master, 4:1 en percusión.' },
+  { term:'Knee', def:'Transición alrededor del umbral. Duro (hard) actúa de golpe; suave (soft) entra de forma gradual.', typical:'0 dB duro, 6 dB suave.' },
+  { term:'Attack', def:'Tiempo que tarda el compresor en reaccionar. Ataques lentos dejan pasar el transitorio; rápidos lo aplastan.', typical:'5–30 ms en batería.' },
+  { term:'Release', def:'Tiempo que tarda en soltar la señal al bajar del umbral. Muy corto bombea; muy largo apaga el groove.', typical:'60–200 ms en la mayoría de fuentes.' },
+  { term:'Gain', def:'Ganancia de compensación (makeup) para recuperar el nivel que se pierde al comprimir.', typical:'Igual a la reducción media, para comparar con y sin compresor.' }
+];
+
+/* ---------- Utilidades ---------- */
+const $ = (s, r = document) => r.querySelector(s);
+const norm = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+const cvar = n => `var(${n})`;
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : v; } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+};
+let toastTimer;
+function toast(msg) {
+  const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 1800);
+}
+async function copyText(text, btn) {
+  let ok = false;
+  try { await navigator.clipboard.writeText(text); ok = true; }
+  catch (e) {
+    try {
+      const ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select(); ok = document.execCommand('copy'); ta.remove();
+    } catch (e2) {}
+  }
+  if (ok) {
+    toast('Copiado al portapapeles');
+    if (btn) { const old = btn.innerHTML; btn.classList.add('done'); btn.textContent = 'Copiado ✓'; setTimeout(() => { btn.classList.remove('done'); btn.innerHTML = old; }, 1600); }
+  } else toast('No se pudo copiar');
+}
+const iconSearch = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="7" cy="7" r="5"/><path d="m11 11 3.5 3.5"/></svg>';
+const iconCopy = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="5" width="9" height="9" rx="2"/><path d="M11 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h1"/></svg>';
+
+/* ---------- Estado ---------- */
+const state = { tab: 'guia', sub: store.get('sfp.sub', 'eq'), q: '', inst: null, cat: 'Todos' };
+const TABS = ['guia', 'flujo', 'mezclas'];
+
+function setTab(t, fromHash) {
+  if (!TABS.includes(t)) t = 'guia';
+  state.tab = t; store.set('sfp.tab', t);
+  document.querySelectorAll('.tab').forEach(b => {
+    const on = b.dataset.tab === t; b.setAttribute('aria-selected', on); b.tabIndex = on ? 0 : -1;
+  });
+  $('#view').setAttribute('aria-labelledby', 'tab-' + t);
+  if (!fromHash && location.hash !== '#' + t) history.replaceState(null, '', '#' + t);
+  render();
+}
+document.querySelectorAll('.tab').forEach(b => b.addEventListener('click', () => setTab(b.dataset.tab)));
+window.addEventListener('hashchange', () => setTab(location.hash.slice(1), true));
+
+function render() {
+  const v = $('#view');
+  if (state.tab === 'guia') renderGuia(v);
+  else if (state.tab === 'flujo') v.innerHTML = todoCard('Flujo & Niveles', 'Llega en el siguiente bloque.', [
+    'Calculadora rítmica por BPM con Tap Tempo y tabla de divisiones en ms',
+    'Calculadora de ganancia y zonas en dB, con headroom',
+    'Respuesta dinámica de compresión (Light, Med, Harsh)',
+    'Checklist de flujo de mezcla en 9 pasos',
+    'Niveles, LUFS, True Peak y panorámica']);
+  else v.innerHTML = todoCard('Mis Mezclas', 'Llega en el bloque final, con persistencia en este navegador.', [
+    'Crear mezclas con título, BPM o tonalidad, fase y notas',
+    'Contadores, búsqueda, filtros y ordenación',
+    'Barra de progreso y fecha de última edición',
+    'Detalle por canción con checklist, duplicado y exportación']);
+}
+function todoCard(title, sub, items) {
+  return `<section class="card todo"><h2>${title}</h2><p>${sub}</p><ul>${items.map(i => `<li>${i}</li>`).join('')}</ul></section>`;
+}
+
+/* ---------- Pestaña 1: Guía & EQ ---------- */
+function renderGuia(v) {
+  const subs = [['eq', 'EQ'], ['comp', 'Compresión'], ['gloss', 'Glosario']];
+  v.innerHTML = `
+    <div class="seg" role="tablist" aria-label="Guía">
+      ${subs.map(([id, l]) => `<button role="tab" data-sub="${id}" aria-selected="${state.sub === id}">${l}</button>`).join('')}
+    </div>
+    <div id="sub"></div>`;
+  v.querySelectorAll('[data-sub]').forEach(b => b.addEventListener('click', () => {
+    state.sub = b.dataset.sub; state.q = ''; state.inst = null; state.cat = 'Todos'; /* reseteo limpio */
+    store.set('sfp.sub', state.sub); renderGuia(v);
+  }));
+  const host = $('#sub');
+  if (state.sub === 'eq') mountEQ(host);
+  else if (state.sub === 'comp') mountComp(host);
+  else mountGloss(host);
+}
+
+function bindSearch(host, ph, onInput) {
+  const i = $('input', host); i.value = state.q;
+  i.addEventListener('input', () => { state.q = i.value; onInput(); });
+}
+const searchBox = ph => `<div class="search">${iconSearch}<input id="q" type="search" placeholder="${ph}" aria-label="${ph}" autocomplete="off"></div>`;
+
+/* EQ */
+const eqText = e => `${e.name}\nLow Cut: ${e.lowCut}\nLow Shelf: ${e.lowShelf}\nBoost: ${e.boost}\nHigh Cut: ${e.highCut}\nPro Tip: ${e.tip}`;
+function mountEQ(host) {
+  host.innerHTML = `
+    <div class="toolbar">
+      ${searchBox('Buscar instrumento, parámetro o frecuencia (ej. 3 kHz)')}
+      <div class="chips" id="chips">
+        ${EQ.map(e => `<button class="chip" style="--c:${cvar(e.color)}" data-id="${e.id}" aria-pressed="false"><i></i>${e.short}</button>`).join('')}
+      </div>
+      <div class="row-actions"><span class="count" id="count"></span><button class="btn primary" id="copyAll">${iconCopy} Copiar guía</button></div>
+    </div>
+    <div class="list" id="results"></div>`;
+  bindSearch(host, '', updateEQ);
+  host.querySelectorAll('.chip').forEach(c => c.addEventListener('click', () => {
+    state.inst = state.inst === c.dataset.id ? null : c.dataset.id; updateEQ();
+  }));
+  updateEQ();
+}
+function filteredEQ() {
+  const q = norm(state.q.trim());
+  return EQ.filter(e => (!state.inst || e.id === state.inst) &&
+    (!q || norm(['Low Cut', 'Low Shelf', 'Boost', 'High Cut', 'Pro Tip', e.name, e.lowCut, e.lowShelf, e.boost, e.highCut, e.tip].join(' ')).includes(q)));
+}
+function updateEQ() {
+  const list = filteredEQ();
+  document.querySelectorAll('#chips .chip').forEach(c => c.setAttribute('aria-pressed', state.inst === c.dataset.id));
+  $('#count').textContent = `${list.length} de ${EQ.length} instrumentos`;
+  const all = $('#copyAll'); const filtered = list.length !== EQ.length;
+  all.innerHTML = `${iconCopy} ${filtered ? 'Copiar coincidencias' : 'Copiar guía completa'}`;
+  all.disabled = !list.length; all.onclick = () => copyText(list.map(eqText).join('\n\n'), all);
+  const res = $('#results');
+  if (!list.length) { res.innerHTML = '<div class="empty">Ningún instrumento coincide. Prueba con otra frecuencia o quita el filtro.</div>'; return; }
+  res.innerHTML = list.map(e => `
+    <article class="card" style="--c:${cvar(e.color)}">
+      <div class="card-head">
+        <div class="badge" aria-hidden="true">${e.short[0]}</div>
+        <h3>${e.name}</h3>
+        <button class="btn" data-copy="${e.id}" aria-label="Copiar ${e.name}">${iconCopy} Copiar</button>
+      </div>
+      <dl class="params" style="margin:0">
+        <div class="param"><dt>Low Cut</dt><dd class="num">${e.lowCut}</dd></div>
+        <div class="param"><dt>Low Shelf</dt><dd class="num">${e.lowShelf}</dd></div>
+        <div class="param boost"><dt>Boost</dt><dd class="num">${e.boost}</dd></div>
+        <div class="param"><dt>High Cut</dt><dd class="num">${e.highCut}</dd></div>
+      </dl>
+      <div class="tip"><b>Pro Tip</b>${e.tip}</div>
+    </article>`).join('');
+  res.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click', () => copyText(eqText(EQ.find(e => e.id === b.dataset.copy)), b)));
+}
+
+/* Compresión */
+const fmtRatio = r => `${String(r).replace('.', ',')}:1`;
+const compText = c => `${c.name} (${c.cat})\nRatio: ${fmtRatio(c.ratio)}\nAttack: ${c.attack}\nRelease: ${c.release}\nGanancia / Umbral: ${c.gain}`;
+function mountComp(host) {
+  host.innerHTML = `
+    <div class="toolbar">
+      ${searchBox('Buscar instrumento o ratio (ej. 4:1)')}
+      <div class="chips" id="chips">
+        ${COMP_CATS.map(c => `<button class="chip" style="--c:${c === 'Todos' ? 'var(--accent)' : cvar(CAT_COLOR[c])}" data-cat="${c}" aria-pressed="false">${c}</button>`).join('')}
+      </div>
+      <div class="row-actions"><span class="count" id="count"></span><button class="btn primary" id="copyAll"></button></div>
+    </div>
+    <div class="list" id="results"></div>
+    <h2 class="section-title">Intensidad general</h2>
+    <div class="presets" id="presets">
+      ${PRESETS.map(p => `
+        <div class="preset" style="--c:${cvar(p.color)}">
+          <h4>${p.name}</h4>
+          <dl><dt>Ratio</dt><dd class="num">${p.ratio}</dd><dt>Knee</dt><dd class="num">${p.knee}</dd><dt>Attack</dt><dd class="num">${p.attack}</dd><dt>Release</dt><dd class="num">${p.release}</dd></dl>
+          <p style="margin:10px 0 0;font-size:13px;color:var(--muted)">${p.note}</p>
+        </div>`).join('')}
+    </div>
+    <div class="row-actions" style="margin-top:12px"><span></span><button class="btn" id="copyPresets">${iconCopy} Copiar presets</button></div>`;
+  bindSearch(host, '', updateComp);
+  host.querySelectorAll('.chip').forEach(c => c.addEventListener('click', () => { state.cat = c.dataset.cat; updateComp(); }));
+  $('#copyPresets').onclick = e => copyText(PRESETS.map(p => `${p.name}: Ratio ${p.ratio}, Knee ${p.knee}, Attack ${p.attack}, Release ${p.release}`).join('\n'), e.currentTarget);
+  updateComp();
+}
+function updateComp() {
+  const q = norm(state.q.trim());
+  const list = COMP.filter(c => (state.cat === 'Todos' || c.cat === state.cat) &&
+    (!q || norm([c.name, c.cat, fmtRatio(c.ratio), c.attack, c.release, c.gain].join(' ')).includes(q)));
+  document.querySelectorAll('#chips .chip').forEach(c => c.setAttribute('aria-pressed', state.cat === c.dataset.cat));
+  $('#count').textContent = `${list.length} de ${COMP.length} fuentes`;
+  const all = $('#copyAll'); const filtered = list.length !== COMP.length;
+  all.innerHTML = `${iconCopy} ${state.cat !== 'Todos' ? 'Copiar grupo' : filtered ? 'Copiar coincidencias' : 'Copiar todo'}`;
+  all.disabled = !list.length; all.onclick = () => copyText(list.map(compText).join('\n\n'), all);
+  const res = $('#results');
+  if (!list.length) { res.innerHTML = '<div class="empty">Sin resultados. Prueba otra categoría o busca un ratio distinto.</div>'; return; }
+  res.innerHTML = list.map((c, i) => `
+    <article class="card" style="--c:${cvar(CAT_COLOR[c.cat])}">
+      <div class="card-head">
+        <div class="badge" aria-hidden="true">${c.name[0]}</div>
+        <h3>${c.name}<small>${c.cat}</small></h3>
+        <button class="btn" data-i="${i}" aria-label="Copiar ${c.name}">${iconCopy} Copiar</button>
+      </div>
+      <dl class="metrics" style="margin:0">
+        <div class="metric"><dt>Ratio</dt><dd class="num">${fmtRatio(c.ratio)}</dd></div>
+        <div class="metric"><dt>Attack</dt><dd class="num">${c.attack}</dd></div>
+        <div class="metric"><dt>Release</dt><dd class="num">${c.release}</dd></div>
+        <div class="metric"><dt>Ganancia / Umbral</dt><dd class="num">${c.gain}</dd></div>
+      </dl>
+      <div class="ratio-bar" aria-hidden="true"><span style="width:${Math.min(100, c.ratio / 8 * 100)}%"></span></div>
+    </article>`).join('');
+  res.querySelectorAll('[data-i]').forEach(b => b.addEventListener('click', () => copyText(compText(list[+b.dataset.i]), b)));
+}
+
+/* Glosario */
+function mountGloss(host) {
+  host.innerHTML = `
+    <div class="toolbar">
+      ${searchBox('Buscar concepto (ej. knee)')}
+      <div class="row-actions"><span class="count" id="count"></span><button class="btn primary" id="copyAll"></button></div>
+    </div>
+    <div class="list" id="results"></div>`;
+  bindSearch(host, '', updateGloss); updateGloss();
+}
+function updateGloss() {
+  const q = norm(state.q.trim());
+  const list = GLOSS.filter(g => !q || norm(g.term + ' ' + g.def + ' ' + g.typical).includes(q));
+  $('#count').textContent = `${list.length} de ${GLOSS.length} conceptos`;
+  const all = $('#copyAll'); all.innerHTML = `${iconCopy} ${list.length !== GLOSS.length ? 'Copiar coincidencias' : 'Copiar glosario'}`;
+  all.disabled = !list.length; all.onclick = () => copyText(list.map(g => `${g.term}: ${g.def} (${g.typical})`).join('\n\n'), all);
+  const res = $('#results');
+  if (!list.length) { res.innerHTML = '<div class="empty">No hay conceptos con ese término.</div>'; return; }
+  res.innerHTML = list.map(g => `
+    <article class="card term">
+      <h3>${g.term}</h3><p>${g.def}</p>
+      <div class="typical"><b>Valores típicos:</b> ${g.typical}</div>
+    </article>`).join('');
+}
+
+/* ---------- Arranque ---------- */
+setTab(TABS.includes(location.hash.slice(1)) ? location.hash.slice(1) : store.get('sfp.tab', 'guia'), true);
+</script>
+
+</body></html>
